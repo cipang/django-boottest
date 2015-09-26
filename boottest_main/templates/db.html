@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Show Database Records</title>
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <th>PK</th>
+            <th>Num Value</th>
+            <th>Text Value</th>
+            <th>Created</th>
+        </thead>
+        {% for r in data %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.num_value }}</td>
+                <td>{{ r.text_value }}</td>
+                <td>{{ r.created }}</td>
+            </tr>
+        {% empty %}
+        <td colspan="4">No record in the database.</p>
+        {% endfor %}
+    </table>
+</body>
+</html>

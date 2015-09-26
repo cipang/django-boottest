@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Boot Test for Django</title>
+</head>
+<body>
+    <h1>Boot Test for Django</h1>
+    <strong>Available Tests:</strong>
+    <ul>
+        <li><a href="{% url 'show_records' %}">Show DB Records</a></li>
+        <li><a href="{% url 'add_records' %}?n=100">Add 100 New Records</a></li>
+        <li><a href="{% url 'download_view' %}">Large File Download Test</a></li>
+        <li><a href="{% url 'xfile' %}">X-Accel-Redirect Test</a></li>
+    </ul>
+    <p><strong>Open: </strong><a href="admin/">Django Admin</a></p>
+    <p><small><em>Page Generated: {{ now|date:"Y-m-d H:i:s" }}<br>
+        {{ filename }}</em></small></p>
+</body>
+</html>

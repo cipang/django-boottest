@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test X-Accel-Redirect</title>
+    <meta charset="UTF-8">
+    <link href="{{ STATIC_URL }}default.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <p>Enter the filename you would like to download with X-Accel-Redirect:</p>
+        <p>Filename: {{ MEDIA_URL }} <input type="text" size="30" name="filename"></p>
+        <p><input type="submit" value="Download!"></p>
+    </form>
+</body>
+</html>

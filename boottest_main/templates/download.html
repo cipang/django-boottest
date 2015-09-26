@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Django Download</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <p>This program will generate certain size of rubbish for you to download, or enter -1 to trigger an exception.</p>
+        <p>Size: <input type="number" size="3" name="mb" value="10"> MB - Ops Between 1K Data:
+            <input type="number" size="10" name="ops" value="10000"></p>
+        <p><input type="submit" value="Download!"></p>
+    </form>
+</body>
+</html>
