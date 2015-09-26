@@ -10,7 +10,14 @@
         <p>This program will generate certain size of rubbish for you to download, or enter -1 to trigger an exception.</p>
         <p>Size: <input type="number" size="3" name="mb" value="10"> MB - Ops Between 1K Data:
             <input type="number" size="10" name="ops" value="10000"></p>
-        <p><input type="submit" value="Download!"></p>
+        <p><input type="submit" value="Download!">
+            <input type="button" value="Error!" onclick="errorCall()"></p>
     </form>
+    <script>
+    function errorCall() {
+        document.getElementsByName("mb")[0].value = -1;
+        document.forms[0].submit();
+    }
+    </script>
 </body>
 </html>

@@ -48,7 +48,9 @@ def download_view(request):
         return render(request, "download.html")
 
     if request.POST["mb"] == "-1":
-        print(math.sqrt(-1))    # Intentionally generate an exception.
+        # Intentionally generate an exception.
+        logging.info("mb=-1 passed in.")
+        print(math.sqrt(-1))
 
     buffer1k = _random_str(1023) + "/"
     mb = max(int(request.POST["mb"]), 1)
