@@ -1,2 +1,2 @@
 web: gunicorn boottest.wsgi --log-file -
-worker: python3 boottest/manage.py rqworker high default low
+worker: python3 manage.py rqworker high default low
