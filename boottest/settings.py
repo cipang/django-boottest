@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'c=h^j2%yi-iz@)yb5dq(x^m)wpvjs)jm7*d+ot&725nmnu-z@)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.environ.get("DEBUG", True))
+DEBUG = bool(os.getenv("DEBUG", True))
 
 ALLOWED_HOSTS = ["*"]
 
@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "boottest_main",
+    "django_rq",
 )
 
 MIDDLEWARE_CLASSES = (
@@ -79,15 +80,16 @@ WSGI_APPLICATION = 'boottest.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join('/tmp', 'djboottest.sqlite3'),
+    }
+}
 
-DATABASES = dict()
-DATABASES["default"] = dj_database_url.config()
+if os.getenv("DATABASE_URL"):
+    DATABASES["default"] = dj_database_url.config()
+
 DATABASES["default"]["CONN_MAX_AGE"] = 1800
 
 
@@ -133,4 +135,20 @@ LOGGING = {
             'propagate': False,
         },
     }
+}
+
+# Django-RQ settings.
+RQ_QUEUES = {
+    'default': {
+        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379'),
+        'DB': 0,
+    },
+    'high': {
+        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379'),
+        'DB': 0,
+    },
+    'low': {
+        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379'),
+        'DB': 0,
+    },
 }

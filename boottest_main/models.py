@@ -11,3 +11,20 @@ class TestRecord(models.Model):
 
     class Meta:
         ordering = ("-num_value",)
+
+
+class BackgroundJob(models.Model):
+    method = models.CharField("Method", max_length=50)
+    args = models.CharField("Args", max_length=200, blank=True, default="")
+    start_time = models.DateTimeField("Start Time")
+    job_id = models.CharField("Job ID", max_length=100, blank=True, default="")
+    result = models.CharField("Result", max_length=200, blank=True, default="")
+    end_time = models.DateTimeField("End Time", null=True, blank=True,
+                                    default=None)
+    error = models.TextField("Error", blank=True, default="")
+
+    def __str__(self):
+        return "{0}".format(self.id)
+
+    class Meta:
+        ordering = ("-id",)

@@ -1,11 +1,14 @@
 import logging
 import math
 import random
+import django_rq
+import time
+import traceback
 from django.shortcuts import render
 from django.utils.timezone import now
 from django.conf import settings
 from django.http import HttpResponse, StreamingHttpResponse
-from .models import TestRecord
+from .models import TestRecord, BackgroundJob
 
 
 _CHARS = "AacdEeFfGHhiJKLmNnpQRrsTtwxYy12346789"
@@ -22,6 +25,33 @@ def _repeat_and_wait(obj, repeat, ops_between_iteration):
         for j in range(0, ops_between_iteration):
             r += (1 if bool(random.randint(0, 1)) else -1) * random.random()
         yield obj
+
+
+def _long_operation(job_name, x, sec):
+    _LOG.info("{0}: x={1} sec={2}".format(job_name, x, sec))
+    record = BackgroundJob.objects.get(id=x)
+    try:
+        result = int(record.args) ** 2
+        time.sleep(sec)
+        record.result = str(result)
+        record.end_time = now()
+        record.save()
+        _LOG.info("{0}: Done, result={1}".format(job_name, result))
+        return result
+    except Exception:
+        record.error = traceback.format_exc()
+        record.save()
+        _LOG.exception("Cannot perform operation for x=%s.", x)
+
+
+@django_rq.job("high")
+def _long_high_job(x):
+    return _long_operation("HIGH" + str(random.randint(1, 999)), x, 10)
+
+
+@django_rq.job("low")
+def _long_low_job(x):
+    return _long_operation("LOW" + str(random.randint(1, 999)), x, 5)
 
 
 def home(request):
@@ -64,6 +94,41 @@ def download_view(request):
     response.streaming_content = _repeat_and_wait(buffer1k, 1024 * mb, ops)
     logging.info("Passing the generator to the response.")
     return response
+
+
+def queue_view(request):
+    if request.method == "GET":
+        return render(request, "queue.html")
+
+    x = random.randint(1, 100)
+    job_type = ""
+    job = None
+    func = None
+
+    if request.POST.get("high"):
+        func = _long_high_job
+        job_type = "high"
+    elif request.POST.get("low"):
+        func = _long_low_job
+        job_type = "low"
+    else:
+        func = _long_low_job
+        x = None
+        job_type = "fail"
+
+    r = BackgroundJob.objects.create(method=job_type,
+                                     args=str(x),
+                                     start_time=now())
+    _LOG.info("Created a record for job, pk=%d", r.id)
+
+    job = func.delay(r.id)
+    r.job_id = job.id
+    r.save()
+    _LOG.info("Queued RQ job with ID %s", job.id)
+
+    return render(request, "queue.html",
+                  {"msg": "Queued a {0} job.".format(job_type),
+                   "now": now()})
 
 
 def xfile(request):

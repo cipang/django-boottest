@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Queue</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <p>
+            <input type="submit" value="Put a High Job" name="high">
+            <input type="submit" value="Put a Low Job" name="low">
+            <input type="submit" value="Put a Fail Job" name="fail">
+        </p>
+        <p>{{ msg }} {{ now|date:"Y-m-d H:i:s" }}</p>
+    </form>
+</body>
+</html>

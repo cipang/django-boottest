@@ -21,6 +21,7 @@ from django.contrib.staticfiles import views as static_views
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^static/(?P<path>.*)$', static_views.serve),
+    url(r'^django-rq/', include("django_rq.urls")),
     url(r'^tests/', include("boottest_main.urls")),
     url(r'^$', "boottest_main.views.home", name='home'),
 ]

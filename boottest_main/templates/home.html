@@ -12,6 +12,7 @@
         <li><a href="{% url 'add_records' %}?n=100">Add 100 New Records</a></li>
         <li><a href="{% url 'download_view' %}">Large File Download Test</a></li>
         <li><a href="{% url 'xfile' %}">X-Accel-Redirect Test</a></li>
+        <li><a href="{% url 'queue_view' %}">Test Django RQ</a></li>
     </ul>
     <p><strong>Open: </strong><a href="admin/">Django Admin</a></p>
     <p><small><em>Page Generated: {{ now|date:"Y-m-d H:i:s" }}<br>
