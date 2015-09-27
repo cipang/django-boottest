@@ -129,6 +129,6 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,
-        }
+        },
     }
 }

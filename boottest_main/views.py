@@ -9,6 +9,7 @@ from .models import TestRecord
 
 
 _CHARS = "AacdEeFfGHhiJKLmNnpQRrsTtwxYy12346789"
+_LOG = logging.getLogger("django")
 
 
 def _random_str(n=5):
@@ -49,13 +50,13 @@ def download_view(request):
 
     if request.POST["mb"] == "-1":
         # Intentionally generate an exception.
-        logging.info("mb=-1 passed in.")
+        _LOG.info("mb=-1 passed in.")
         print(math.sqrt(-1))
 
     buffer1k = _random_str(1023) + "/"
     mb = max(int(request.POST["mb"]), 1)
     ops = int(request.POST.get("ops", 0))
-    logging.info("Start generating %dMB data now (with ops=%d)...", mb, ops)
+    _LOG.info("Start generating %dMB data now (with ops=%d)...", mb, ops)
     response = StreamingHttpResponse()
     response["Content-Type"] = "application/binary"
     response["Content-Disposition"] = "attachment; filename=\"random{0}-{1}MB.bin\"".format(random.randint(10, 99), mb)
