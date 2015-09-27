@@ -110,6 +110,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(os.path.expanduser("~"), "staticroot")
+
 # Log to console.
 LOGGING = {
     'version': 1,
