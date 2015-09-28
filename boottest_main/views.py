@@ -111,6 +111,10 @@ def queue_view(request):
     elif request.POST.get("low"):
         func = _long_low_job
         job_type = "low"
+    elif request.POST.get("pdf"):
+        from htmltopdf import generate_pdf
+        func = generate_pdf
+        job_type = "pdf"
     else:
         func = _long_low_job
         x = None
@@ -144,3 +148,8 @@ def xfile(request):
     response["X-Accel-Redirect"] = file_path
     response["Content-Disposition"] = 'attachment; filename="' + filename + '"'
     return response
+
+
+def test_pdf(request):
+    return render(request, "pdf.html", {"data": TestRecord.objects.all()[0:20],
+                                        "job_id": "TESTING-NO-JOB-ID"})

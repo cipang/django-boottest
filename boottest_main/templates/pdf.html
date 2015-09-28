@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF</title>
+    <meta charset="UTF-8">
+    <style>
+    body, th, td { font-family: "PingFang", "Arial", sans-serif; font-size: 16px; line-height: 1.3; }
+    th { background-color: #ccc; }
+    .cn { font-family: "Courier New", monospace; }
+    .ar { font-family: Arial, monospace; font-weight: bold; font-style: italic; }
+    footer { font-size: 13px; font-weight: bold; padding-top: 10px; margin-top: 2em;
+        border-top: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>PDF Test</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <p>其他語言生成 PDF 文件的測試。</p>
+
+    <table border="1" width="99%">
+        <tr>
+            <th>ID</th>
+            <th>數字</th>
+            <th>Text 文字值</th>
+            <th>Date</th>
+        </tr>
+        {% for r in data %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td class="ar">{{ r.num_value }}</td>
+                <td class="cn">{{ r.text_value }}</td>
+                <td>{{ r.created }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <footer class="cn">{{ job_id }}</footer>
+</body>
+</html>
