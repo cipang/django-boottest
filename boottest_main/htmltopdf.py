@@ -40,11 +40,15 @@ def generate_pdf(record_pk):
             pdf_filename = f.name
 
         logger.info("Call wkhtmltopdf...")
-        result = subprocess.call([wkhtmltopdf, html_filename, pdf_filename]).returncode
+        result = subprocess.call([wkhtmltopdf, html_filename, pdf_filename])
 
         job.result = str(result) + " " + str(os.stat(pdf_filename))
         job.end_time = now()
         job.save()
+
+        os.unlink(html_filename)
+        os.unlink(pdf_filename)
+        logger.info("Created PDF at %s", pdf_filename)
         return True
     except Exception:
         logger.exception("PDF error")
