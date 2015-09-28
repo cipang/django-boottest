@@ -4,6 +4,7 @@ import rq
 import os
 import time
 import subprocess
+import random
 from django.template.loader import render_to_string
 from tempfile import NamedTemporaryFile
 from boto.s3.connection import S3Connection
@@ -15,7 +16,6 @@ logger = logging.getLogger("django")
 
 def generate_html(job_id):
     def create_data(n):
-        import random
         import sys
         obj_type = (object, bool, tuple, float, int)
         for i in range(0, n):
