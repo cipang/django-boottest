@@ -6,6 +6,7 @@ import time
 import traceback
 from django.shortcuts import render
 from django.utils.timezone import now
+from django.template.loader import render_to_string
 from django.conf import settings
 from django.http import HttpResponse, StreamingHttpResponse
 from .models import TestRecord, BackgroundJob
@@ -112,7 +113,7 @@ def queue_view(request):
         func = _long_low_job
         job_type = "low"
     elif request.POST.get("pdf"):
-        from htmltopdf import generate_pdf
+        from .htmltopdf import generate_pdf
         func = generate_pdf
         job_type = "pdf"
     else:
@@ -151,5 +152,7 @@ def xfile(request):
 
 
 def test_pdf(request):
-    return render(request, "pdf.html", {"data": TestRecord.objects.all()[0:20],
-                                        "job_id": "TESTING-NO-JOB-ID"})
+    html = render_to_string("pdf.html",
+                            {"data": TestRecord.objects.all()[0:20],
+                             "job_id": "No Job ID - Testing"})
+    return HttpResponse(html)
