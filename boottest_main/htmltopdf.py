@@ -15,11 +15,12 @@ logger = logging.getLogger("django")
 def generate_pdf(record_pk):
     try:
         job = BackgroundJob.objects.get(id=record_pk)
+        rq_job = rq.get_current_job()
 
         html = render_to_string("pdf.html",
                                 {"data": TestRecord.objects.all()[0:20],
-                                 "job_id": rq.get_current_job().job_id})
-        output_file = "/tmp/test_{0}.pdf".format(job.job_id)
+                                 "job_id": rq_job.id})
+        output_file = "/tmp/test_{0}.pdf".format(rq_job.id)
         wkhtmltopdf = os.path.join(os.path.expanduser("~"),
                                    "bin",
                                    "wkhtmltopdf-linux-amd64")
@@ -31,5 +32,5 @@ def generate_pdf(record_pk):
         job.save()
         return True
     except Exception:
-        logger.logException("PDF error")
+        logger.exception("PDF error")
         return False
