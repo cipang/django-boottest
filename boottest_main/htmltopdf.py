@@ -80,7 +80,7 @@ def generate_pdf(dummy_parameter):
 
         os.unlink(html_filename)
         os.unlink(pdf_filename)
-        logger.info("PDF was stored to S3 with key.")
+        logger.info("PDF was stored to S3 with key {0}.".format(key.name))
         return True
     except Exception:
         logger.exception("PDF error")
