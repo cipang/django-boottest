@@ -31,7 +31,7 @@ def generate_html(job_id):
 
 
 @django_rq.job("low")
-def generate_pdf():
+def generate_pdf(dummy_parameter):
     try:
         logger.info("Loading PDF job information...")
         rq_job = rq.get_current_job()
