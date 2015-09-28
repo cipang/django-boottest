@@ -69,7 +69,7 @@ def generate_pdf(dummy_parameter):
         try:
             bucket = conn.get_bucket(s3_bucket)
             key = Key(bucket)
-            key.name = "test_{0}.pdf".format(time.time())
+            key.name = "test_{0}.pdf".format(int(time.time()))
             key.content_type = "application/pdf"
             key.content_disposition = "attachment; filename=" + \
                 os.path.basename(pdf_filename)
