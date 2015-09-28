@@ -152,7 +152,6 @@ def xfile(request):
 
 
 def test_pdf(request):
-    html = render_to_string("pdf.html",
-                            {"data": TestRecord.objects.all()[0:20],
-                             "job_id": "No Job ID - Testing"})
+    from .htmltopdf import generate_html
+    html = generate_html("No Job ID - Testing")
     return HttpResponse(html)

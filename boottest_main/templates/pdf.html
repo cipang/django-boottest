@@ -25,18 +25,22 @@
     <table border="1" width="99%">
         <tr>
             <th>ID</th>
-            <th>數字</th>
-            <th>Text 文字值</th>
-            <th>Date</th>
+            <th>Code 文字值</th>
+            <th>哈希值</th>
+            <th>Memory Size</th>
         </tr>
         {% for r in data %}
             <tr>
-                <td>{{ r.id }}</td>
-                <td class="ar">{{ r.num_value }}</td>
-                <td class="cn">{{ r.text_value }}</td>
-                <td>{{ r.created }}</td>
+                <td>{{ r.0 }}</td>
+                <td class="cn">{{ r.1 }}</td>
+                <td class="ar">{{ r.2 }}</td>
+                <td align="right">{{ r.3 }}</td>
             </tr>
         {% endfor %}
+        <tr>
+            <td colspan="3" align="right">Total Memory Size 記憶體用量</td>
+            <td align="right">{{ total }}</td>
+        </tr>
     </table>
 
     <footer class="cn">{{ job_id }}</footer>

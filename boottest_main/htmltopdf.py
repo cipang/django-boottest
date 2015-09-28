@@ -2,23 +2,38 @@ import logging
 import django_rq
 import rq
 import os
+import time
 import subprocess
-from django.utils.timezone import now
 from django.template.loader import render_to_string
 from tempfile import NamedTemporaryFile
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
-from .models import TestRecord, BackgroundJob
 
 
 logger = logging.getLogger("django")
 
 
+def generate_html(job_id):
+    def create_data(n):
+        import random
+        import sys
+        obj_type = (object, bool, tuple, float, int)
+        for i in range(0, n):
+            obj = random.choice(obj_type)()
+            yield (i, str(obj), hash(obj), sys.getsizeof(obj))
+
+    data = list(create_data(25))
+    html = render_to_string("pdf.html",
+                            {"data": data,
+                             "total": sum(x[3] for x in data),
+                             "job_id": job_id})
+    return html
+
+
 @django_rq.job("low")
-def generate_pdf(record_pk):
+def generate_pdf():
     try:
         logger.info("Loading PDF job information...")
-        job = BackgroundJob.objects.get(id=record_pk)
         rq_job = rq.get_current_job()
         wkhtmltopdf = os.path.join(os.path.expanduser("~"),
                                    "bin",
@@ -28,9 +43,7 @@ def generate_pdf(record_pk):
         f = NamedTemporaryFile(suffix=".html", delete=False)
         html_filename = f.name
         try:
-            html = render_to_string("pdf.html",
-                                    {"data": TestRecord.objects.all()[0:20],
-                                     "job_id": rq_job.id})
+            html = generate_html(rq_job.id)
             f.write(html.encode("utf-8"))
             f.flush()
         finally:
@@ -41,11 +54,12 @@ def generate_pdf(record_pk):
         with NamedTemporaryFile(suffix=".pdf", delete=False) as f:
             pdf_filename = f.name
 
-        logger.info("Call wkhtmltopdf...")
+        logger.info("Call %s...", wkhtmltopdf)
         result = subprocess.call([wkhtmltopdf, "-q", html_filename,
                                   pdf_filename])
         if result != 0:
             raise OSError("wkhtmltopdf failed with result {0}.".format(result))
+        logger.info("Created PDF at %s.", pdf_filename)
 
         logger.info("Sending to S3...")
         aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
@@ -55,18 +69,18 @@ def generate_pdf(record_pk):
         try:
             bucket = conn.get_bucket(s3_bucket)
             key = Key(bucket)
-            key.name = "test_{0}.pdf".format(record_pk)
+            key.name = "test_{0}.pdf".format(time.time())
+            key.content_type = "application/pdf"
+            key.content_disposition = "attachment; filename=" + \
+                os.path.basename(pdf_filename)
             key.set_contents_from_filename(pdf_filename)
+            key.make_public()
         finally:
             conn.close()
 
-        job.result = str(result) + " " + str(os.stat(pdf_filename))
-        job.end_time = now()
-        job.save()
-
         os.unlink(html_filename)
         os.unlink(pdf_filename)
-        logger.info("Created PDF at %s", pdf_filename)
+        logger.info("PDF was stored to S3 with key.")
         return True
     except Exception:
         logger.exception("PDF error")
