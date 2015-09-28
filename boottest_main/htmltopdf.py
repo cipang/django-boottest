@@ -40,7 +40,7 @@ def generate_pdf(record_pk):
             pdf_filename = f.name
 
         logger.info("Call wkhtmltopdf...")
-        result = subprocess.call(wkhtmltopdf, html_filename, pdf_filename).returncode
+        result = subprocess.call([wkhtmltopdf, html_filename, pdf_filename]).returncode
 
         job.result = str(result) + " " + str(os.stat(pdf_filename))
         job.end_time = now()
