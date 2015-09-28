@@ -6,6 +6,8 @@ import subprocess
 from django.utils.timezone import now
 from django.template.loader import render_to_string
 from tempfile import NamedTemporaryFile
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
 from .models import TestRecord, BackgroundJob
 
 
@@ -40,7 +42,23 @@ def generate_pdf(record_pk):
             pdf_filename = f.name
 
         logger.info("Call wkhtmltopdf...")
-        result = subprocess.call([wkhtmltopdf, html_filename, pdf_filename])
+        result = subprocess.call([wkhtmltopdf, "-q", html_filename,
+                                  pdf_filename])
+        if result != 0:
+            raise OSError("wkhtmltopdf failed with result {0}.".format(result))
+
+        logger.info("Sending to S3...")
+        aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
+        aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+        s3_bucket = os.getenv("S3_BUCKET")
+        conn = S3Connection(aws_access_key_id, aws_secret_access_key)
+        try:
+            bucket = conn.get_bucket(s3_bucket)
+            key = Key(bucket)
+            key.name = "test_{0}.pdf".format(record_pk)
+            key.set_contents_from_filename(pdf_filename)
+        finally:
+            conn.close()
 
         job.result = str(result) + " " + str(os.stat(pdf_filename))
         job.end_time = now()
