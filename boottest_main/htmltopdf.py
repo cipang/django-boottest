@@ -22,7 +22,7 @@ def generate_html(job_id):
             obj = random.choice(obj_type)()
             yield (i, str(obj), hash(obj), sys.getsizeof(obj))
 
-    data = list(create_data(25))
+    data = list(create_data(random.randint(25, 40)))
     html = render_to_string("pdf.html",
                             {"data": data,
                              "total": sum(x[3] for x in data),
@@ -71,8 +71,8 @@ def generate_pdf(dummy_parameter):
             key = Key(bucket)
             key.name = "test_{0}.pdf".format(int(time.time()))
             key.content_type = "application/pdf"
-            key.content_disposition = "attachment; filename=" + \
-                os.path.basename(pdf_filename)
+            key.metadata["Content-Disposition"] = "attachment; filename=\"" + \
+                os.path.basename(pdf_filename) + "\""
             key.set_contents_from_filename(pdf_filename)
             key.make_public()
         finally:
