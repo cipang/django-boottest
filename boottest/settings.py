@@ -139,10 +139,6 @@ LOGGING = {
 
 # Django-RQ settings.
 RQ_QUEUES = {
-    'default': {
-        'URL': os.getenv('REDIS_URL', 'redis://localhost:6379'),
-        'DB': 0,
-    },
     'high': {
         'URL': os.getenv('REDIS_URL', 'redis://localhost:6379'),
         'DB': 0,

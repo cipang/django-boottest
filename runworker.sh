@@ -28,5 +28,5 @@ fi
 
 chmod a+x ~/bin/*
 echo "`basename "$0"`: init done. starting worker..."
-python manage.py rqworker high default low
+python manage.py rqworker high low
 exit 0
