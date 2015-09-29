@@ -7,8 +7,8 @@ import subprocess
 import random
 from django.template.loader import render_to_string
 from tempfile import NamedTemporaryFile
-from boto.s3.connection import S3Connection
-from boto.s3.key import Key
+from boto3.session import Session
+from urllib.parse import quote
 
 
 logger = logging.getLogger("django")
@@ -65,22 +65,23 @@ def generate_pdf(dummy_parameter):
         aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
         aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
         s3_bucket = os.getenv("S3_BUCKET")
-        conn = S3Connection(aws_access_key_id, aws_secret_access_key)
-        try:
-            bucket = conn.get_bucket(s3_bucket)
-            key = Key(bucket)
-            key.name = "test_{0}.pdf".format(int(time.time()))
-            key.content_type = "application/pdf"
-            key.metadata["Content-Disposition"] = "attachment; filename=\"" + \
-                os.path.basename(pdf_filename) + "\""
-            key.set_contents_from_filename(pdf_filename)
-            key.make_public()
-        finally:
-            conn.close()
+        session = Session(aws_access_key_id, aws_secret_access_key)
+        s3 = session.resource("s3")
+
+        # Generate Content-Disposition metadata for the S3 file.
+        s3_key_name = "test_{0}.pdf".format(int(time.time()))
+        content_disposition = "attachment; filename=\"{0}\"; filename*=utf-8''{1}"
+        content_disposition = content_disposition.format("test.pdf",
+                                                         quote("測試 File.pdf"))
+        with open(pdf_filename, "rb") as f:
+            s3.Object(s3_bucket, s3_key_name).put(ACL="public-read",
+                                                  ContentType="application/pdf",
+                                                  ContentDisposition=content_disposition,
+                                                  Body=f)
 
         os.unlink(html_filename)
         os.unlink(pdf_filename)
-        logger.info("PDF was stored to S3 with key {0}.".format(key.name))
+        logger.info("PDF was stored to S3 as {0}.".format(s3_key_name))
         return True
     except Exception:
         logger.exception("PDF error")
